@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import AuthHomePage from './pages/auth/AuthHomePage';
+import StoreHomePage from './pages/StoreHomePage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import LoginPage from './pages/LoginPage';
@@ -53,7 +53,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthHomePage />} />
+        <Route path="/" element={<StoreHomePage />} />
         
         <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
         <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
@@ -93,7 +93,7 @@ function App() {
           } 
         />
         
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );

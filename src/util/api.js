@@ -14,6 +14,10 @@ export const logoutApi = (refreshToken) => {
     return axios.post('logout', { refreshToken });
 };
 
+export const getHomeProductsApi = (limit = 8) => {
+    return axios.get(`products/home?limit=${limit}`);
+};
+
 export const getUserProfileApi = () => {
     return axios.get('/user/profile', { baseURL: '' });
 };

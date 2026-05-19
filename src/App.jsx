@@ -10,6 +10,8 @@ import ModeratorProfilePage from './pages/ModeratorProfilePage';
 import AdminManagementPage from './pages/AdminManagementPage';
 import ModeratorUsersPage from './pages/ModeratorUsersPage';
 import GuestRoute from './components/common/GuestRoute';
+import ProductDetailPage from './pages/ProductDetailPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 
 const getRoleIdFromToken = () => {
   const token = localStorage.getItem('accessToken');
@@ -59,6 +61,9 @@ function App() {
         <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
         
         <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+
+        <Route path="/product/:slug" element={<ProductDetailPage />} />
+        <Route path="/article/:slug" element={<ArticleDetailPage />} />
         
         <Route 
           path="/user/profile" 

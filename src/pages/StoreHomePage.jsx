@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../redux/slices/authSlice';
-import { getHomeProductsApi } from '../util/api';
+import { getHomeArticlesApi, getHomeProductsApi } from '../util/api';
 
 const formatVnd = (value) => {
     return Number(value || 0).toLocaleString('vi-VN', {
@@ -41,7 +41,7 @@ const ProductSection = ({ code, title, subtitle, products, showSold = false }) =
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 {products.map((product) => (
-                    <article key={product.id || product.slug} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100/60">
+                    <Link key={product.id || product.slug} to={`/product/${product.slug || product.id}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100/60">
                         <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
                             <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                             {product.discount > 0 ? <span className="absolute right-3 top-3 rounded-full bg-rose-500 px-3 py-1 text-xs font-bold text-white">-{product.discount}%</span> : null}
@@ -53,7 +53,36 @@ const ProductSection = ({ code, title, subtitle, products, showSold = false }) =
                             <div className="text-sm text-slate-400 line-through">{formatVnd(product.oldPrice)}</div>
                             {showSold ? <div className="mt-2 text-sm font-semibold text-emerald-600">Đã bán: {product.sold}</div> : null}
                         </div>
-                    </article>
+                    </Link>
+                ))}
+            </div>
+        </section>
+    );
+};
+
+const ArticleSection = ({ articles }) => {
+    return (
+        <section className="mt-10">
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-orange-600">NEWS</div>
+                    <h2 className="mt-1 text-2xl font-black text-slate-900 md:text-3xl">Tin tức mới nhất</h2>
+                </div>
+                <p className="text-sm text-slate-500">Bài viết công nghệ nổi bật, chia sẻ nhanh và dễ đọc</p>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {articles.map((article) => (
+                    <Link key={article.slug} to={`/article/${article.slug}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100/60">
+                        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                            <img src={article.coverImage} alt={article.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+                        </div>
+                        <div className="p-4 text-left">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{article.category}</div>
+                            <h3 className="mt-2 min-h-[56px] text-lg font-bold leading-7 text-slate-900">{article.title}</h3>
+                            <p className="mt-2 line-clamp-3 text-sm text-slate-500">{article.summary}</p>
+                        </div>
+                    </Link>
                 ))}
             </div>
         </section>
@@ -69,7 +98,9 @@ const StoreHomePage = () => {
         latest: [],
         bestseller: [],
     });
+    const [articles, setArticles] = useState([]);
     const [loadingProducts, setLoadingProducts] = useState(true);
+    const [loadingArticles, setLoadingArticles] = useState(true);
     const [loadError, setLoadError] = useState('');
 
     useEffect(() => {
@@ -96,7 +127,22 @@ const StoreHomePage = () => {
             }
         };
 
+        const fetchArticles = async () => {
+            setLoadingArticles(true);
+            try {
+                const res = await getHomeArticlesApi(4);
+                if (res?.errCode === 0 && Array.isArray(res?.data)) {
+                    setArticles(res.data);
+                }
+            } catch {
+                setArticles([]);
+            } finally {
+                setLoadingArticles(false);
+            }
+        };
+
         fetchProducts();
+        fetchArticles();
     }, []);
 
     const member = useMemo(() => {
@@ -226,6 +272,14 @@ const StoreHomePage = () => {
                         />
                     </>
                 ) : null}
+
+                {loadingArticles ? (
+                    <div className="mt-10 rounded-3xl border border-orange-100 bg-white p-6 text-sm font-semibold text-orange-700">
+                        Đang tải bài viết mới nhất...
+                    </div>
+                ) : null}
+
+                {!loadingArticles && articles.length ? <ArticleSection articles={articles} /> : null}
             </main>
         </div>
     );

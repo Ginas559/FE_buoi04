@@ -18,6 +18,18 @@ export const getHomeProductsApi = (limit = 8) => {
     return axios.get(`products/home?limit=${limit}`);
 };
 
+export const getProductDetailApi = (slug) => {
+    return axios.get(`products/${slug}`);
+};
+
+export const getHomeArticlesApi = (limit = 6) => {
+    return axios.get(`articles/home?limit=${limit}`);
+};
+
+export const getArticleDetailApi = (slug) => {
+    return axios.get(`articles/${slug}`);
+};
+
 export const getUserProfileApi = () => {
     return axios.get('/user/profile', { baseURL: '' });
 };

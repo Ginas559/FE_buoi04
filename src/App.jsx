@@ -12,6 +12,8 @@ import ModeratorUsersPage from './pages/ModeratorUsersPage';
 import GuestRoute from './components/common/GuestRoute';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
+import SearchPage from './pages/SearchPage';
+import CartPage from './pages/CartPage';
 
 const getRoleIdFromToken = () => {
   const token = localStorage.getItem('accessToken');
@@ -64,6 +66,8 @@ function App() {
 
         <Route path="/product/:slug" element={<ProductDetailPage />} />
         <Route path="/article/:slug" element={<ArticleDetailPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/cart" element={<CartPage />} />
         
         <Route 
           path="/user/profile" 

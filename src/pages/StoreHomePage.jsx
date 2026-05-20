@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { SearchOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { logoutUser } from '../redux/slices/authSlice';
 import { getHomeArticlesApi, getHomeProductsApi } from '../util/api';
+import { getCartCount } from '../util/cart';
 
 const formatVnd = (value) => {
     return Number(value || 0).toLocaleString('vi-VN', {
@@ -102,6 +104,8 @@ const StoreHomePage = () => {
     const [loadingProducts, setLoadingProducts] = useState(true);
     const [loadingArticles, setLoadingArticles] = useState(true);
     const [loadError, setLoadError] = useState('');
+    const [searchValue, setSearchValue] = useState('');
+    const [cartCount, setCartCount] = useState(0);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -145,6 +149,19 @@ const StoreHomePage = () => {
         fetchArticles();
     }, []);
 
+    useEffect(() => {
+        const syncCartCount = () => setCartCount(getCartCount());
+        syncCartCount();
+
+        window.addEventListener('cart:updated', syncCartCount);
+        window.addEventListener('storage', syncCartCount);
+
+        return () => {
+            window.removeEventListener('cart:updated', syncCartCount);
+            window.removeEventListener('storage', syncCartCount);
+        };
+    }, []);
+
     const member = useMemo(() => {
         const fromLocalStorage = (() => {
             try {
@@ -170,19 +187,47 @@ const StoreHomePage = () => {
         navigate('/login');
     };
 
+    const onSubmitSearch = (event) => {
+        event.preventDefault();
+        if (searchValue.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+            return;
+        }
+        navigate('/search');
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-slate-50 text-slate-900">
             <header className="sticky top-0 z-20 border-b border-orange-100 bg-white/95 backdrop-blur">
                 <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 lg:px-6">
-                    <div className="inline-flex items-center gap-3">
+                    <Link to="/" className="inline-flex items-center gap-3">
                         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 text-xl font-black text-white shadow-lg shadow-orange-300/40">S</span>
                         <div className="text-left">
                             <div className="text-lg font-black text-slate-900">SmartZone Store</div>
                             <div className="text-xs uppercase tracking-[0.2em] text-orange-600">Tech Lifestyle</div>
                         </div>
-                    </div>
+                    </Link>
+
+                    <form onSubmit={onSubmitSearch} className="order-3 flex h-12 w-full flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-500 shadow-sm lg:order-none lg:w-auto">
+                        <SearchOutlined />
+                        <input
+                            value={searchValue}
+                            onChange={(event) => setSearchValue(event.target.value)}
+                            placeholder="Tìm kiếm điện thoại, laptop, tablet..."
+                            className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+                        />
+                    </form>
+
+                    <Link to="/" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Tin tức
+                    </Link>
 
                     <div className="ml-auto flex flex-wrap items-center gap-3">
+                        <Link className="inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700" to="/cart">
+                            <ShoppingCartOutlined />
+                            <span>Giỏ hàng ({cartCount})</span>
+                        </Link>
+
                         {!isAuthenticated ? (
                             <>
                                 <Link to="/login" className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Đăng nhập</Link>

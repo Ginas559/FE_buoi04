@@ -22,6 +22,14 @@ export const getProductDetailApi = (slug) => {
     return axios.get(`products/${slug}`);
 };
 
+export const getProductCategoriesApi = () => {
+    return axios.get('products/categories');
+};
+
+export const searchProductsApi = (params = {}) => {
+    return axios.get('products', { params });
+};
+
 export const getHomeArticlesApi = (limit = 6) => {
     return axios.get(`articles/home?limit=${limit}`);
 };

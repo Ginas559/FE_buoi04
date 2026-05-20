@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Carousel } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 import { getProductDetailApi } from '../util/api';
 import { logoutUser } from '../redux/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, getCartCount } from '../util/cart';
 
 const formatVnd = (value) => {
     return Number(value || 0).toLocaleString('vi-VN', {
@@ -23,6 +25,7 @@ const ProductDetailPage = () => {
     const [detail, setDetail] = useState(null);
     const [related, setRelated] = useState([]);
     const [qty, setQty] = useState(1);
+    const [cartCount, setCartCount] = useState(0);
 
     useEffect(() => {
         const load = async () => {
@@ -45,6 +48,19 @@ const ProductDetailPage = () => {
         load();
     }, [slug]);
 
+    useEffect(() => {
+        const syncCartCount = () => setCartCount(getCartCount());
+        syncCartCount();
+
+        window.addEventListener('cart:updated', syncCartCount);
+        window.addEventListener('storage', syncCartCount);
+
+        return () => {
+            window.removeEventListener('cart:updated', syncCartCount);
+            window.removeEventListener('storage', syncCartCount);
+        };
+    }, []);
+
     const memberName = useMemo(() => {
         const fallback = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
         return fallback || user?.email || 'Member';
@@ -53,6 +69,11 @@ const ProductDetailPage = () => {
     const onLogout = async () => {
         await dispatch(logoutUser());
         navigate('/login');
+    };
+
+    const onAddToCart = () => {
+        addToCart(detail, totalQty);
+        setCartCount(getCartCount());
     };
 
     if (loading) {
@@ -73,6 +94,10 @@ const ProductDetailPage = () => {
                 <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 lg:px-6">
                     <Link to="/" className="text-xl font-black text-slate-900">SmartZone Store</Link>
                     <div className="ml-auto flex items-center gap-3">
+                        <Link to="/cart" className="inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
+                            <ShoppingCartOutlined />
+                            <span>Giỏ hàng ({cartCount})</span>
+                        </Link>
                         {isAuthenticated ? (
                             <>
                                 <div className="rounded-2xl border border-orange-100 bg-orange-50 px-4 py-2 text-sm font-semibold text-slate-700">
@@ -184,6 +209,20 @@ const ProductDetailPage = () => {
                                 <div>Số lượng chọn: <span className="font-semibold">{totalQty}</span></div>
                                 <div>Trạng thái: <span className="font-semibold">{stockLeft > 0 ? 'Còn hàng' : 'Hết hàng'}</span></div>
                             </div>
+                        </div>
+
+                        <div className="mt-6 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={onAddToCart}
+                                disabled={stockLeft <= 0}
+                                className="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                Thêm vào giỏ hàng
+                            </button>
+                            <Link to="/cart" className="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                                Xem giỏ hàng
+                            </Link>
                         </div>
                     </section>
                 </div>

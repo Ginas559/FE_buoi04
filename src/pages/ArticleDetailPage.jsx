@@ -54,12 +54,19 @@ const ArticleDetailPage = () => {
     }
 
     const images = Array.isArray(article.images) && article.images.length ? article.images : [article.coverImage].filter(Boolean);
+    const safeImages = (images || [])
+        .map((s) => (typeof s === 'string' ? s.trim() : s))
+        .filter(Boolean);
+    if (!safeImages.length) safeImages.push('https://via.placeholder.com/1200x800?text=No+image');
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-slate-50 text-slate-900">
             <header className="border-b border-orange-100 bg-white/95 backdrop-blur">
                 <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 lg:px-6">
                     <Link to="/" className="text-xl font-black text-slate-900">SmartZone Store</Link>
+                    <Link to="/search" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Trang tìm kiếm
+                    </Link>
                     <div className="ml-auto flex items-center gap-3">
                         {isAuthenticated ? (
                             <>
@@ -76,16 +83,16 @@ const ArticleDetailPage = () => {
             <main className="mx-auto max-w-7xl px-4 py-6 lg:px-6">
                 <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
                     <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-                        {images.length > 1 ? (
+                        {safeImages.length > 1 ? (
                             <Carousel ref={carouselRef} autoplay dots={false} adaptiveHeight className="h-full w-full">
-                                {images.map((src, index) => (
+                                {safeImages.map((src, index) => (
                                     <div key={src + index} className="h-[240px] sm:h-[320px] md:h-[420px] lg:h-[520px] w-full">
-                                        <img src={src} alt={`${article.title}-${index}`} className="h-full w-full object-cover" />
+                                        <img src={src} alt={`${article.title}-${index}`} className="h-full w-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/1200x800?text=No+image'; }} />
                                     </div>
                                 ))}
                             </Carousel>
                         ) : (
-                            <img src={images[0]} alt={article.title} className="h-[240px] sm:h-[320px] md:h-[420px] lg:h-[520px] w-full object-cover" />
+                            <img src={safeImages[0]} alt={article.title} className="h-[240px] sm:h-[320px] md:h-[420px] lg:h-[520px] w-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/1200x800?text=No+image'; }} />
                         )}
 
                         <button
@@ -111,9 +118,7 @@ const ArticleDetailPage = () => {
                         <div className="mt-3 text-sm text-slate-500">Tác giả: {article.author}</div>
                         <div className="mt-4 text-sm font-semibold text-slate-500">Lượt xem: {article.views}</div>
                         <p className="mt-5 text-base leading-8 text-slate-600">{article.summary}</p>
-                        <article className="mt-6 rounded-3xl border border-orange-100 bg-orange-50 p-5 text-base leading-8 text-slate-700">
-                            {article.content}
-                        </article>
+                        <article className="mt-6 rounded-3xl border border-orange-100 bg-orange-50 p-5 text-base leading-8 text-slate-700" dangerouslySetInnerHTML={{ __html: article.content || article.summary }} />
                         <div className="mt-6 flex flex-wrap gap-2">
                             {Array.isArray(article.tags) ? article.tags.map((tag) => (
                                 <span key={tag} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-orange-700 shadow-sm">#{tag}</span>

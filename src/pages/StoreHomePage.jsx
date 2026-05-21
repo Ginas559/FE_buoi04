@@ -62,9 +62,9 @@ const ProductSection = ({ code, title, subtitle, products, showSold = false }) =
     );
 };
 
-const ArticleSection = ({ articles }) => {
+const ArticleSection = ({ articles, id }) => {
     return (
-        <section className="mt-10">
+        <section id={id} className="mt-10">
             <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <div className="text-xs font-black uppercase tracking-[0.22em] text-orange-600">NEWS</div>
@@ -218,9 +218,13 @@ const StoreHomePage = () => {
                         />
                     </form>
 
-                    <Link to="/" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                        Tin tức
+                    <Link to="/search" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Trang tìm kiếm
                     </Link>
+
+                    <a href="#tin-tuc" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Tin tức
+                    </a>
 
                     <div className="ml-auto flex flex-wrap items-center gap-3">
                         <Link className="inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700" to="/cart">
@@ -324,7 +328,7 @@ const StoreHomePage = () => {
                     </div>
                 ) : null}
 
-                {!loadingArticles && articles.length ? <ArticleSection articles={articles} /> : null}
+                {!loadingArticles && articles.length ? <ArticleSection articles={articles} id="tin-tuc" /> : null}
             </main>
         </div>
     );

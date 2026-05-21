@@ -64,6 +64,10 @@ const CartPage = () => {
                         <span className="text-xl">SmartZone Store</span>
                     </Link>
 
+                    <Link to="/search" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Trang tìm kiếm
+                    </Link>
+
                     <div className="ml-auto flex flex-wrap items-center gap-3">
                         <Link className="inline-flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700" to="/cart">
                             <ShoppingCartOutlined />

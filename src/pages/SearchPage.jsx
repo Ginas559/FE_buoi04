@@ -170,7 +170,12 @@ const SearchPage = () => {
                             placeholder="Tìm kiếm điện thoại, laptop, tablet..."
                             className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
                         />
+
                     </form>
+
+                    <Link to="/search" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Trang tìm kiếm
+                    </Link>
 
                     <Link to="/" className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                         Tin tức

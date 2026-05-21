@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LogoutOutlined, SearchOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { logoutUser } from '../redux/slices/authSlice';
 import { getProductCategoriesApi, searchProductsApi } from '../util/api';
-import { getCartCount } from '../util/cart';
+import { fetchCart, getCartCount } from '../util/cart';
 
 const priceRanges = [
     { label: '0đ - 2.000.000đ', minPrice: 0, maxPrice: 2000000 },
@@ -72,13 +72,28 @@ const SearchPage = () => {
     }, [searchParamsString]);
 
     useEffect(() => {
+        let isMounted = true;
+
         const syncCartCount = () => setCartCount(getCartCount());
-        syncCartCount();
+        const loadCartCount = async () => {
+            try {
+                await fetchCart();
+            } catch {
+                // keep cached count if backend is unavailable
+            } finally {
+                if (isMounted) {
+                    syncCartCount();
+                }
+            }
+        };
+
+        loadCartCount();
 
         window.addEventListener('cart:updated', syncCartCount);
         window.addEventListener('storage', syncCartCount);
 
         return () => {
+            isMounted = false;
             window.removeEventListener('cart:updated', syncCartCount);
             window.removeEventListener('storage', syncCartCount);
         };
